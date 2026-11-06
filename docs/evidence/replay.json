@@ -1,0 +1,41 @@
+{
+  "days": 134,
+  "first_day": "2023-03-03",
+  "last_day": "2023-10-19",
+  "forecast": {
+    "miss_pct": 64.9,
+    "same_weekday_last_week_miss_pct": 75.9,
+    "in_range_pct": 76.1,
+    "bias_pct": 2.3,
+    "methods_used": {
+      "Last 20 days' average, shaped by weekday": 78,
+      "Average of the last six same weekdays": 50,
+      "Same weekday last week": 6
+    }
+  },
+  "workers": {
+    "covered_pct": 79.9,
+    "covered_if_high_pct": 94.8,
+    "exact_pct": 39.6,
+    "short_days": 27,
+    "over_days": 54,
+    "staffed_high_days": 16,
+    "mean_planned": 2.04,
+    "mean_needed": 1.84
+  },
+  "replenishment": {
+    "boxes_moved": 12610,
+    "boxes_needed": 16261,
+    "boxes_useful": 3514,
+    "useful_pct": 27.9,
+    "caught_pct": 21.6,
+    "mean_boxes_per_day": 94.1
+  },
+  "checks": {
+    "crew": 32,
+    "spike": 76,
+    "missing": 33,
+    "reslot": 33,
+    "short": 8
+  }
+}
