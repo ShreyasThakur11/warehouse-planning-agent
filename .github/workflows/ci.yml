@@ -62,5 +62,4 @@ jobs:
       - name: Plan every day and build the dashboard
         run: warehouse-planner site
       - name: Hold the dashboard to the published evidence
-        continue-on-error: true
         run: python scripts/check_replay.py

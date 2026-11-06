@@ -45,14 +45,16 @@ def grade(warehouse: Warehouse, plan: Plan) -> dict | None:
     rep = plan.results["replenishment"]
     workers = plan.results["workers"]["today"]
     needed = workers_for(
-        picking_hours(actual["pairs"], actual["lines"], actual["runs"], settings)
+        picking_hours(
+            float(actual["pairs"]), float(actual["lines"]), float(actual["runs"]), settings
+        )
         + moving_hours(rep["boxes"], settings),
         settings,
     )
 
     # Boxes that truly had to come down: the pairs sold over the cover window
     # beyond what levels 1-2 held, up to what reserve held.
-    position = warehouse.days.get_loc(day)
+    position = int(warehouse.days.searchsorted(day))
     window = warehouse.days[position : position + settings.cover_days]
     sold = warehouse.sku_matrix.loc[window].sum()
     stock = warehouse.stock[["pick", "reserve"]].reindex(sold.index).fillna(0)
@@ -103,10 +105,11 @@ def summarise(warehouse: Warehouse, graded: list[tuple[Plan, dict | None]]) -> d
     actual = np.array([g["pairs"] for _, g in rows], dtype=float)
     forecast = np.array([p.results["forecast"]["today"]["pairs"] for p, _ in rows], dtype=float)
     pairs = warehouse.daily["pairs"]
+    weekday = pd.DatetimeIndex(pairs.index).day_of_week
     naive = []
     for p, _ in rows:
         day = pd.Timestamp(p.day)
-        same = pairs[(pairs.index < day) & (pairs.index.day_of_week == day.day_of_week)]
+        same = pairs[(pairs.index < day) & (weekday == day.day_of_week)]
         naive.append(
             float(same.iloc[-1]) if len(same) else float(pairs[pairs.index < day].iloc[-1])
         )

@@ -164,7 +164,7 @@ class Warehouse:
 
     @cached_property
     def slots_by_sku(self) -> dict[str, pd.DataFrame]:
-        return {sku: part for sku, part in self.slots.groupby("sku")}
+        return {str(sku): part for sku, part in self.slots.groupby("sku")}
 
     @cached_property
     def level_of(self) -> dict[str, int]:

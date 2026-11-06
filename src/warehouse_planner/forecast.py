@@ -55,7 +55,7 @@ def point_forecast(history: pd.Series, target: pd.Timestamp, method: str) -> flo
     """One method's forecast for ``target`` from working days before it."""
     return _forecast(
         history.to_numpy(dtype=float),
-        history.index.day_of_week.to_numpy(),
+        pd.DatetimeIndex(history.index).day_of_week.to_numpy(),
         target.day_of_week,
         method,
     )
@@ -66,7 +66,7 @@ def _backtest(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Actual pairs and this method's forecasts on the working days just before ``day``."""
     values = series.to_numpy(dtype=float)
-    weekdays = series.index.day_of_week.to_numpy()
+    weekdays = pd.DatetimeIndex(series.index).day_of_week.to_numpy()
     end = int(series.index.searchsorted(day))
     start = max(0, end - days)
     guess = np.array(
