@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Secrets
+.env
+
+# Built by `warehouse-planner site`
+_site/
+
+# Tools for the browser check and the documents
+scripts/node_modules/
+scripts/documents/node_modules/
+
+# Editors and systems
+.vscode/
+.idea/
+.DS_Store

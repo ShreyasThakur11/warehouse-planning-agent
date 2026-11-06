@@ -1,0 +1,20 @@
+NOTICE
+
+The MIT licence in LICENSE covers the source code in this repository.
+
+THE DATASET
+
+The files in data/ are four of the files in the "Order Picking Dataset from a
+Warehouse of a Footwear Manufacturing Company", version 1, published on Mendeley
+Data under the Creative Commons Attribution 4.0 International licence (CC BY 4.0).
+
+  DOI      10.17632/pf2w725pw3.1
+  Paper    de Assis, de Paula Ferreira and Ouhimmou (2025), Data in Brief 61, 111837
+  Licence  https://creativecommons.org/licenses/by/4.0/
+
+The four files are unchanged from the published version. Their SHA-256 hashes are
+listed in data/README.md, and the tests check them on every run. The agent reads
+them as they are: it decodes sizes, splits location codes into aisle, bay and
+level, and adds up orders by day. Those readings are described in docs/DATA.md.
+
+The dataset's creators do not endorse this project.

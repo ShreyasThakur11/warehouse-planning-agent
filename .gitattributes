@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.pdf binary
+*.pptx binary
+
+# Kept byte for byte, so a clone can be checked against the published dataset.
+data/*.csv -text -diff
