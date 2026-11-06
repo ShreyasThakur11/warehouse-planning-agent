@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warehouse-planning-agent"
+version = "1.0.0"
+description = "An AI agent that plans a footwear warehouse's day: demand, SKUs in demand, replenishment from levels 3-4 to 1-2, and workers."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Shreyas Thakur" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "pandas>=2.1"]
+
+[project.optional-dependencies]
+claude = ["anthropic>=0.40"]
+
+[project.scripts]
+warehouse-planner = "warehouse_planner.cli:main"
+
+[project.urls]
+Dashboard = "https://shreyasthakur11.github.io/warehouse-planning-agent/"
+Source = "https://github.com/ShreyasThakur11/warehouse-planning-agent"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "RUF046"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
