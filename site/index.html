@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Warehouse Planning Agent</title>
+<meta name="description" content="An AI agent that plans a footwear warehouse's day: it forecasts demand, finds the SKUs in demand, brings stock down from levels 3-4 to 1-2, and sets how many workers each day needs.">
+<meta property="og:title" content="Warehouse Planning Agent">
+<meta property="og:description" content="Every morning it forecasts demand, finds the SKUs in demand, brings stock down from levels 3-4 to 1-2, and sets the day's workers.">
+<meta property="og:image" content="https://shreyasthakur11.github.io/warehouse-planning-agent/social-preview.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/common.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="favicon.svg" alt="" width="30" height="30">Warehouse Planning Agent</a>
+    <nav class="nav" aria-label="Pages">
+      <a href="./" aria-current="page">Today</a>
+      <a href="history.html">Track record</a>
+      <a href="how.html">How it works</a>
+      <a href="https://github.com/ShreyasThakur11/warehouse-planning-agent">Code</a>
+    </nav>
+    <button class="theme" type="button" aria-label="Switch between light and dark">Dark</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="loading" id="loading">Loading the agent's plan…</div>
+  <div class="error hidden" id="failed">The plan could not be loaded. Reload the page to try again.</div>
+
+  <div id="page" class="hidden">
+    <div class="daybar">
+      <div>
+        <div class="eyebrow" id="replay-line">Live replay</div>
+        <h1 id="title">Plan</h1>
+        <p id="made"></p>
+      </div>
+      <div class="picker">
+        <button type="button" id="prev" aria-label="Previous day">Previous</button>
+        <label class="hidden" for="day">Day</label>
+        <select id="day" aria-label="Choose a day"></select>
+        <button type="button" id="next" aria-label="Next day">Next</button>
+        <button type="button" id="today" class="btn-primary">Today</button>
+      </div>
+    </div>
+
+    <section class="panel brief">
+      <header>
+        <span class="eyebrow">The agent's brief</span>
+        <span class="brain">Brain: <b id="brain"></b></span>
+      </header>
+      <p id="brief"></p>
+    </section>
+
+    <section class="kpis" aria-label="Today in four numbers">
+      <div class="kpi"><div class="label">Pairs expected</div><div class="value" id="k-pairs"></div><div class="note" id="k-pairs-note"></div></div>
+      <div class="kpi"><div class="label">Order lines expected</div><div class="value" id="k-lines"></div><div class="note" id="k-lines-note"></div></div>
+      <div class="kpi"><div class="label">Workers needed</div><div class="value" id="k-workers"></div><div class="note" id="k-workers-note"></div></div>
+      <div class="kpi"><div class="label">Boxes to bring down</div><div class="value" id="k-boxes"></div><div class="note" id="k-boxes-note"></div></div>
+    </section>
+
+    <section class="panel" id="run-panel">
+      <header>
+        <div>
+          <h2>What the agent did this morning</h2>
+          <p class="muted small">Every step, in order. Tools do the arithmetic; the brain decides what to call and what to do with the answer.</p>
+        </div>
+      </header>
+      <ul class="loop" id="loop"></ul>
+      <ol class="run" id="run"></ol>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <header>
+          <h2>Demand forecast</h2>
+          <p class="muted small" id="method"></p>
+        </header>
+        <ul class="legend">
+          <li><span class="swatch"></span>Pairs shipped</li>
+          <li><span class="swatch accent"></span>Forecast</li>
+          <li><span class="swatch band"></span>Likely range</li>
+        </ul>
+        <div class="chart" id="forecast-chart"></div>
+      </div>
+      <div class="panel">
+        <header>
+          <h2>Workers each day</h2>
+          <p class="muted small" id="workers-note"></p>
+        </header>
+        <ul class="legend">
+          <li><span class="swatch bar"></span>Plan</li>
+          <li><span class="swatch bar-soft"></span>If the day runs high</li>
+          <li><span class="swatch dash"></span>Roster</li>
+        </ul>
+        <div class="chart" id="workers-chart"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header>
+        <div>
+          <h2>SKUs in demand</h2>
+          <p class="muted small" id="skus-note"></p>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>SKU</th><th class="num">Expected pairs</th><th class="num">Share</th><th>Trend, last 10 days</th><th class="num">Boxes on L1-2</th><th class="num">Boxes on L3-4</th><th class="num">Days on L1-2</th><th>Sales class</th></tr></thead>
+          <tbody id="skus"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header>
+        <div>
+          <h2>Bring down from levels 3-4 to 1-2</h2>
+          <p class="muted small" id="moves-note"></p>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th class="num">#</th><th>SKU</th><th>Size</th><th class="num">Boxes</th><th>From levels 3-4</th><th>To levels 1-2</th><th>Why</th></tr></thead>
+          <tbody id="moves"></tbody>
+        </table>
+      </div>
+      <button class="btn more hidden" type="button" id="more-moves"></button>
+      <ul class="notes" id="rep-notes"></ul>
+    </section>
+
+    <section class="panel" id="checks-panel">
+      <header><h2>For the supervisor</h2></header>
+      <ul class="notes" id="checks"></ul>
+    </section>
+
+    <section class="panel" id="result-panel">
+      <header>
+        <div>
+          <h2>How this plan did</h2>
+          <p class="muted small" id="result-note"></p>
+        </div>
+      </header>
+      <div class="results" id="results"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Records: Order Picking Dataset from a Warehouse of a Footwear Manufacturing Company, de Assis, de Paula Ferreira and Ouhimmou (2025), <a href="https://doi.org/10.17632/pf2w725pw3.1">CC BY 4.0</a>. The creators do not endorse this project.</p>
+    <p>Developed by <a href="https://github.com/ShreyasThakur11">Shreyas Thakur</a>. Code under the MIT licence.</p>
+  </div>
+</footer>
+<script src="js/charts.js"></script>
+<script src="js/today.js"></script>
+</body>
+</html>

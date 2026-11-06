@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Track record · Warehouse Planning Agent</title>
+<meta name="description" content="Every plan the agent made, checked against what the warehouse actually shipped and needed: forecast miss, workers covered, and boxes brought down that were needed.">
+<meta property="og:title" content="Track record · Warehouse Planning Agent">
+<meta property="og:description" content="Every plan the agent made, checked against what actually happened, including where it is weak.">
+<meta property="og:image" content="https://shreyasthakur11.github.io/warehouse-planning-agent/social-preview.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/common.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="favicon.svg" alt="" width="30" height="30">Warehouse Planning Agent</a>
+    <nav class="nav" aria-label="Pages">
+      <a href="./">Today</a>
+      <a href="history.html" aria-current="page">Track record</a>
+      <a href="how.html">How it works</a>
+      <a href="https://github.com/ShreyasThakur11/warehouse-planning-agent">Code</a>
+    </nav>
+    <button class="theme" type="button" aria-label="Switch between light and dark">Dark</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="loading" id="loading">Loading the track record…</div>
+  <div class="error hidden" id="failed">The track record could not be loaded. Reload the page to try again.</div>
+
+  <div id="page" class="hidden">
+    <div class="daybar">
+      <div>
+        <div class="eyebrow">Track record</div>
+        <h1>How far to trust the agent</h1>
+        <p id="intro"></p>
+      </div>
+    </div>
+
+    <section class="kpis" aria-label="The replay in four numbers">
+      <div class="kpi"><div class="label">Forecast miss</div><div class="value" id="s-miss"></div><div class="note" id="s-miss-note"></div></div>
+      <div class="kpi"><div class="label">Days inside the likely range</div><div class="value" id="s-range"></div><div class="note" id="s-range-note"></div></div>
+      <div class="kpi"><div class="label">Days with enough workers</div><div class="value" id="s-workers"></div><div class="note" id="s-workers-note"></div></div>
+      <div class="kpi"><div class="label">Boxes brought down that were needed</div><div class="value" id="s-boxes"></div><div class="note" id="s-boxes-note"></div></div>
+    </section>
+
+    <section class="panel">
+      <header>
+        <div>
+          <h2>Pairs: forecast against shipped</h2>
+          <p class="muted small">Each forecast was made the morning before, from earlier orders only.</p>
+        </div>
+      </header>
+      <ul class="legend">
+        <li><span class="swatch"></span>Pairs shipped</li>
+        <li><span class="swatch accent"></span>Forecast</li>
+        <li><span class="swatch band"></span>Likely range</li>
+      </ul>
+      <div class="chart" id="pairs-chart"></div>
+    </section>
+
+    <section class="grid-even">
+      <div class="panel">
+        <header>
+          <div>
+            <h2>Workers: planned against needed</h2>
+            <p class="muted small">Needed is what the day's real orders and the boxes moved took, at the same time standard.</p>
+          </div>
+        </header>
+        <ul class="legend">
+          <li><span class="swatch"></span>Needed</li>
+          <li><span class="swatch accent"></span>Planned</li>
+        </ul>
+        <div class="chart" id="workers-chart"></div>
+      </div>
+      <div class="panel">
+        <header>
+          <div>
+            <h2>Boxes: moved against needed</h2>
+            <p class="muted small">Needed means the box's SKU size sold out of levels 1-2 within the cover window.</p>
+          </div>
+        </header>
+        <ul class="legend">
+          <li><span class="swatch"></span>Moved</li>
+          <li><span class="swatch accent"></span>Moved and needed</li>
+        </ul>
+        <div class="chart" id="boxes-chart"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header><h2>Where it is weak</h2></header>
+      <ul class="notes" id="weak"></ul>
+    </section>
+
+    <section class="grid-even">
+      <div class="panel">
+        <header>
+          <div>
+            <h2>Forecast methods it chose</h2>
+            <p class="muted small">Every morning it scores three methods on the last 30 working days and uses the best.</p>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th class="num">Days chosen</th></tr></thead>
+            <tbody id="methods"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <header>
+          <div>
+            <h2>What it raised for the supervisor</h2>
+            <p class="muted small">Checks the agent runs on its own plan before reporting it.</p>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Check</th><th class="num">Days raised</th></tr></thead>
+            <tbody id="checks"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header>
+        <div>
+          <h2>Every day</h2>
+          <p class="muted small">Open a day to see the full plan and every step the agent took.</p>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Day</th><th class="num">Forecast</th><th class="num">Range</th><th class="num">Shipped</th><th class="num">Miss</th><th class="num">Workers planned</th><th class="num">Needed</th><th class="num">Boxes moved</th><th class="num">Needed</th><th class="num">Checks</th></tr></thead>
+          <tbody id="days"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Records: Order Picking Dataset from a Warehouse of a Footwear Manufacturing Company, de Assis, de Paula Ferreira and Ouhimmou (2025), <a href="https://doi.org/10.17632/pf2w725pw3.1">CC BY 4.0</a>. The creators do not endorse this project.</p>
+    <p>Developed by <a href="https://github.com/ShreyasThakur11">Shreyas Thakur</a>. Code under the MIT licence.</p>
+  </div>
+</footer>
+<script src="js/charts.js"></script>
+<script src="js/history.js"></script>
+</body>
+</html>

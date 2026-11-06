@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>How it works · Warehouse Planning Agent</title>
+<meta name="description" content="How the agent plans a warehouse day: observe, decide, act, check and report, with tools that do every sum and a guard that keeps the language model from inventing numbers.">
+<meta property="og:title" content="How it works · Warehouse Planning Agent">
+<meta property="og:description" content="Observe, decide, act, check, report: how the agent plans each day, and why no number in its plan is made up.">
+<meta property="og:image" content="https://shreyasthakur11.github.io/warehouse-planning-agent/social-preview.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/common.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="favicon.svg" alt="" width="30" height="30">Warehouse Planning Agent</a>
+    <nav class="nav" aria-label="Pages">
+      <a href="./">Today</a>
+      <a href="history.html">Track record</a>
+      <a href="how.html" aria-current="page">How it works</a>
+      <a href="https://github.com/ShreyasThakur11/warehouse-planning-agent">Code</a>
+    </nav>
+    <button class="theme" type="button" aria-label="Switch between light and dark">Dark</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="daybar">
+    <div>
+      <div class="eyebrow">How it works</div>
+      <h1>An agent that plans the warehouse's day</h1>
+      <p>Every morning, before picking starts, the agent answers four questions: how much will ship, which SKUs are in demand, which boxes to bring down from levels 3-4 to levels 1-2, and how many workers the day needs. It decides what to look at and what to do next. Small tools do every sum, so no number in the plan is made up.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Five steps, every morning</h2>
+    <ol class="steps">
+      <li>
+        <h3>Observe</h3>
+        <p>Reads the orders up to the last working day and grades the last plan against what shipped.</p>
+        <code>read_orders<br>check_yesterday</code>
+      </li>
+      <li>
+        <h3>Decide</h3>
+        <p>Scores three forecasting methods on the last 30 working days and picks the one that missed least. If recent days ran above forecast, it staffs for a high day.</p>
+        <code>compare_forecast_methods</code>
+      </li>
+      <li>
+        <h3>Act</h3>
+        <p>Forecasts the next five working days, finds the SKUs in demand, plans the boxes to bring down and sets the workers.</p>
+        <code>forecast_demand<br>find_skus_in_demand<br>plan_replenishment<br>plan_workers</code>
+      </li>
+      <li>
+        <h3>Check</h3>
+        <p>Checks its own plan: more workers than the roster, demand the racks cannot cover, a sudden spike, idle boxes on levels 1-2.</p>
+        <code>check_plan</code>
+      </li>
+      <li>
+        <h3>Report</h3>
+        <p>Writes a short brief for the supervisor and raises anything a person must decide, instead of settling it alone.</p>
+        <code>brief and escalations</code>
+      </li>
+    </ol>
+  </section>
+
+  <section class="cards">
+    <div class="panel">
+      <h3>Two brains, the same tools</h3>
+      <p>The <b>built-in rules</b> always run the five steps in order. They planned every day in the replay, so the track record can be checked by anyone.</p>
+      <p>With an Anthropic API key, <b>Claude</b> runs the morning instead. It chooses which tool to call next, reads each answer and decides what to do with it. It never calculates: every figure comes back from a tool. If its brief contains a number no tool produced, the brief is rejected and the agent writes it from the tools' answers.</p>
+    </div>
+    <div class="panel">
+      <h3>How replenishment works</h3>
+      <p>Levels 1-2 should hold enough of each SKU size for the next <span data-setting="cover_days"></span> working days. Where they fall short, the agent brings boxes down from levels 3-4, nearest first: the same bay, then the same aisle, and level 3 before level 4.</p>
+      <p>A SKU size with no box on levels 1-2 gets a new pick face. Its slots come from boxes that have not sold in 40 working days, which move up to reserve. The list shows each box: where it comes from, where it goes and why.</p>
+    </div>
+    <div class="panel">
+      <h3>How the forecast works</h3>
+      <p>Three simple methods compete every morning: the same weekday last week, the average of the last six same weekdays, and the last 20 days' average shaped by weekday. The one that missed least over the last <span data-setting="backtest_days"></span> working days makes the forecast.</p>
+      <p>The likely range comes from how far its forecasts actually missed. Demand is split across SKU sizes by their share of the last 40 working days.</p>
+    </div>
+    <div class="panel">
+      <h3>How workers are counted</h3>
+      <p>Each forecast day becomes hours of work: a walk and a setup for each trolley run, a stop for each order line, a few seconds for each pair, and a minute for each box brought down. Hours become workers at <span data-setting="productive_hours"></span> productive hours a shift.</p>
+      <p>A day that needs more than the <span data-setting="crew_on_roster"></span> workers on the roster goes to the supervisor.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <header>
+      <div>
+        <h2>Every number it works with</h2>
+        <p class="muted small">Each value is measured from the records, taken from the original project report, or an assumption. Assumptions can be changed in one file without touching the code.</p>
+      </div>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Value</th><th class="num">Setting</th><th>Source</th></tr></thead>
+        <tbody id="settings"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid-even">
+    <div class="panel">
+      <header><h2>The records</h2></header>
+      <dl class="facts" id="records"></dl>
+    </div>
+    <div class="panel">
+      <header><h2>What it cannot know</h2></header>
+      <ul class="notes">
+        <li><b>One storage snapshot.</b> The records hold one picture of what sat where, so every morning starts from it. A live warehouse system would feed the real position each day.</li>
+        <li><b>One box is one pair.</b> The records list boxes by location, not how many pairs each holds.</li>
+        <li><b>Box moves take a minute.</b> The time to bring one box down is an assumption, not a measurement.</li>
+        <li><b>The records end.</b> The last day planned is the first working day after them, and nothing can check it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel">
+    <header><h2>Run it yourself</h2></header>
+    <pre><code>pip install -e .
+warehouse-planner plan                 # plan the next working day, step by step
+warehouse-planner plan --date 2023-06-16
+warehouse-planner replay               # plan every day and score the plans
+warehouse-planner site                 # build this dashboard into _site/</code></pre>
+    <p class="muted small">Set <code>ANTHROPIC_API_KEY</code> to let Claude run the morning. Without it, the built-in rules run it.</p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Records: Order Picking Dataset from a Warehouse of a Footwear Manufacturing Company, de Assis, de Paula Ferreira and Ouhimmou (2025), <a href="https://doi.org/10.17632/pf2w725pw3.1">CC BY 4.0</a>. The creators do not endorse this project.</p>
+    <p>Developed by <a href="https://github.com/ShreyasThakur11">Shreyas Thakur</a>. Code under the MIT licence.</p>
+  </div>
+</footer>
+<script src="js/how.js"></script>
+</body>
+</html>

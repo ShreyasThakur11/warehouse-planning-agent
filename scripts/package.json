@@ -1,0 +1,9 @@
+{
+  "name": "warehouse-planning-agent-tools",
+  "private": true,
+  "type": "module",
+  "description": "The browser check for the dashboard.",
+  "dependencies": {
+    "puppeteer-core": "23.11.1"
+  }
+}

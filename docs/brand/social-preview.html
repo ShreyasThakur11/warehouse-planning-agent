@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warehouse Planning Agent social preview</title>
+<style>
+  html, body { margin: 0; width: 1280px; height: 640px; overflow: hidden; }
+  body {
+    position: relative; box-sizing: border-box; padding: 76px 80px;
+    display: grid; grid-template-columns: minmax(0, 1fr) 430px; gap: 64px;
+    background: #f6f7f9; color: #12161b; font-family: "Segoe UI", system-ui, Arial, sans-serif;
+  }
+  .mark { width: 88px; height: 88px; display: block; }
+  h1 { font-size: 66px; line-height: 1.03; letter-spacing: -0.02em; font-weight: 700; margin: 30px 0 20px; }
+  p { font-size: 27px; line-height: 1.42; color: #47505b; margin: 0; }
+  .url { position: absolute; left: 80px; bottom: 58px; font-size: 21px; color: #626b77; }
+  .loop { align-self: center; display: grid; gap: 12px; }
+  .step {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; align-items: center;
+    background: #ffffff; border: 1px solid #e1e5ea; border-radius: 12px; padding: 14px 20px;
+  }
+  .n { width: 44px; height: 44px; border-radius: 50%; background: #1f5fbf; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 20px; }
+  .step b { display: block; font-size: 24px; }
+  .step span { font-size: 18px; color: #626b77; }
+</style>
+</head>
+<body>
+  <div>
+    <img class="mark" src="mark.svg" alt="">
+    <h1>Warehouse Planning Agent</h1>
+    <p>Every morning it forecasts demand, finds the SKUs in demand, brings stock down from levels 3&#8209;4 to 1&#8209;2, and sets the day's workers.</p>
+  </div>
+  <div class="loop">
+    <div class="step"><div class="n">1</div><div><b>Observe</b><span>the orders and the last plan</span></div></div>
+    <div class="step"><div class="n">2</div><div><b>Decide</b><span>the forecast method that missed least</span></div></div>
+    <div class="step"><div class="n">3</div><div><b>Act</b><span>demand, SKUs, boxes and workers</span></div></div>
+    <div class="step"><div class="n">4</div><div><b>Check</b><span>its own plan against the roster and racks</span></div></div>
+    <div class="step"><div class="n">5</div><div><b>Report</b><span>a brief for the supervisor</span></div></div>
+  </div>
+  <div class="url">shreyasthakur11.github.io/warehouse-planning-agent</div>
+</body>
+</html>
